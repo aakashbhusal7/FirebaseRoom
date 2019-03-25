@@ -10,6 +10,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import practice.example.aakash.firebasesample.data.entity.Person;
 
 
@@ -17,7 +18,7 @@ import practice.example.aakash.firebasesample.data.entity.Person;
 public interface PersonDao {
 
     @Query("SELECT * FROM people ORDER BY name ASC" )
-    LiveData<List<Person>> findAllPeople();
+    Flowable<List<Person>> findAllPeople();
 
     @Query("SELECT * FROM people")
     List<Person> getAllPeople();

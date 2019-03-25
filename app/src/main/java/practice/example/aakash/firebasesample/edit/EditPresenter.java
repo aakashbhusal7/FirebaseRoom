@@ -1,11 +1,18 @@
 package practice.example.aakash.firebasesample.edit;
 
+import android.os.Handler;
+
 import com.facebook.stetho.common.Util;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import practice.example.aakash.firebasesample.data.DatabaseManager;
 import practice.example.aakash.firebasesample.data.entity.Person;
@@ -23,8 +30,16 @@ public class EditPresenter implements EditContract.Presenter {
         this.databaseManager=databaseManager;
     }
     @Override
-    public void save(Person person) {
-       this.databaseManager.getPersonDao().insertPerson(person);
+    public void save(final Person person) {
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                databaseManager.getPersonDao().insertPerson(person);
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+//       this.databaseManager.getPersonDao().insertPerson(person);
         view.close();
     }
 
@@ -51,7 +66,40 @@ public class EditPresenter implements EditContract.Presenter {
     }
 
     @Override
-    public void getPersonAndPopulate(long id) {
+    public void getPersonAndPopulate(final long id) {
+
+//        Completable.fromAction(new Action() {
+//            @Override
+//            public void run() throws Exception {
+//                //Person person=databaseManager.getPersonDao().findPerson(id);
+////                new Handler().post(new Runnable(){
+////                    @Override
+////                    public void run() {
+//                        Person person=databaseManager.getPersonDao().findPerson(id);
+//
+//                   // }
+//                }
+////                if (person!=null){
+////                    view.populate(person);
+////                }
+//        }).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new CompletableObserver() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//                });
         Person person=databaseManager.getPersonDao().findPerson(id);
         if (person!=null){
             view.populate(person);
@@ -59,7 +107,15 @@ public class EditPresenter implements EditContract.Presenter {
     }
 
     @Override
-    public void update(Person person) {
+    public void update(final Person person) {
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                databaseManager.getPersonDao().updatePerson(person);
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
         int id= this.databaseManager.getPersonDao().updatePerson(person);
         view.close();
     }

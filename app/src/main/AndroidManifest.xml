@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignUpActivity">
+        <activity android:name=".listedit.ListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,8 +26,8 @@
         </activity>
         <activity android:name=".ResetPasswordActivity">
         </activity>
-        <activity android:name=".listedit.ListActivity">
-        </activity>
+        <!--<activity android:name=".listedit.ListActivity">-->
+        <!--</activity>-->
         <activity
             android:name=".edit.EditActivity"
             android:label="Contacts"
