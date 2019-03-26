@@ -13,8 +13,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import dagger.android.AndroidInjectionModule;
-import dagger.android.AndroidInjector;
 import practice.example.aakash.firebasesample.R;
 import practice.example.aakash.firebasesample.data.DatabaseManager;
 import practice.example.aakash.firebasesample.data.entity.Person;
@@ -27,7 +25,6 @@ ListContract.DeleteListener{
 
     @Inject
     ListContract.Presenter listPresenter;
-//    PersonRepositoryImpl personRepositoryImpl;
     private PeopleAdapter peopleAdapter;
     ActivityListBinding activityListBinding;
 

@@ -1,6 +1,5 @@
 package practice.example.aakash.firebasesample.edit;
 
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,11 +10,9 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import practice.example.aakash.firebasesample.R;
-import practice.example.aakash.firebasesample.data.AppDatabase;
 import practice.example.aakash.firebasesample.data.DatabaseManager;
 import practice.example.aakash.firebasesample.data.entity.Person;
 import practice.example.aakash.firebasesample.databinding.ActivityEditBinding;
-import practice.example.aakash.firebasesample.listedit.ListActivity;
 import practice.example.aakash.firebasesample.utils.Constants;
 
 public class EditActivity extends AppCompatActivity implements EditContract.View {
@@ -37,7 +34,6 @@ public class EditActivity extends AppCompatActivity implements EditContract.View
         activityEditBinding = DataBindingUtil.setContentView(this, R.layout.activity_edit);
         person = new Person();
         checkMode();
-//        AppDatabase db= AppDatabase.getAppDatabase(getApplication());
         new EditPresenter(this, databaseManager);
         initViews();
     }

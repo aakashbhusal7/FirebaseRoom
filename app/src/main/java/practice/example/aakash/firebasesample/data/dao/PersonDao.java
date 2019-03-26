@@ -24,7 +24,10 @@ public interface PersonDao {
     List<Person> getAllPeople();
 
     @Query("SELECT * FROM people WHERE id=:id")
-    Person findPerson(long id);
+    Flowable<Person> findPerson(long id);
+
+    @Query("SELECT * FROM people WHERE id=:id")
+    Person findSpecificPerson(long id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertPerson(Person person);
@@ -37,6 +40,7 @@ public interface PersonDao {
 
     @Delete
     void deletePerson(Person person);
+
 
     @Query("DELETE FROM people")
     void deleteAll();

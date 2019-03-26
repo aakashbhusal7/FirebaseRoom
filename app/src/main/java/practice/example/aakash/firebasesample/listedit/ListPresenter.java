@@ -1,24 +1,19 @@
 package practice.example.aakash.firebasesample.listedit;
 
 
-import android.arch.lifecycle.Observer;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
-import io.reactivex.FlowableSubscriber;
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import practice.example.aakash.firebasesample.data.DatabaseManager;
-import practice.example.aakash.firebasesample.data.dao.PersonDao;
 import practice.example.aakash.firebasesample.data.entity.Person;
 
 public class ListPresenter implements ListContract.Presenter {
@@ -26,14 +21,7 @@ public class ListPresenter implements ListContract.Presenter {
     private ListContract.View view;
     DatabaseManager databaseManager;
     private CompositeDisposable compositeDisposable;
-    // PersonRepositoryImpl personRepositoryImpl;
 
-//    @Inject
-//    public ListPresenter(ListContract.View view,PersonRepositoryImpl personRepositoryImpl){
-//        this.view=view;
-//        this.view.setPresenter(this);
-//        this.personRepositoryImpl=personRepositoryImpl;
-//    }
     @Inject
     public ListPresenter(ListContract.View view,DatabaseManager databaseManager){
         this.view=view;
@@ -69,7 +57,6 @@ public class ListPresenter implements ListContract.Presenter {
             }
         }));
 
-
 //        databaseManager.getPersonDao().findAllPeople().observeForever(new Observer<List<Person>>() {
 //            @Override
 //            public void onChanged(@Nullable List<Person> personList) {
@@ -92,9 +79,28 @@ public class ListPresenter implements ListContract.Presenter {
     }
 
     @Override
-    public void delete(long personId) {
-        Person person=databaseManager.getPersonDao().findPerson(personId);
-        databaseManager.getPersonDao().deletePerson(person);
+    public void delete(final long personId) {
+
+                compositeDisposable=new CompositeDisposable();
+                compositeDisposable.add(databaseManager.getPersonDao().findPerson(personId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Person>() {
+                    @Override
+                    public void accept(Person person) throws Exception {
+
+                    }
+                }));
+               Completable.fromAction(new Action() {
+                   @Override
+                   public void run() throws Exception {
+                       Person person=databaseManager.getPersonDao().findSpecificPerson(personId);
+                       databaseManager.getPersonDao().deletePerson(person);
+                   }
+               }).subscribeOn(Schedulers.io())
+                       .observeOn(AndroidSchedulers.mainThread())
+                       .subscribe();
+
     }
 
 

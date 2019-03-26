@@ -1,18 +1,12 @@
 package practice.example.aakash.firebasesample.edit;
 
-import android.os.Handler;
-
-import com.facebook.stetho.common.Util;
-
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import practice.example.aakash.firebasesample.data.DatabaseManager;
 import practice.example.aakash.firebasesample.data.entity.Person;
@@ -23,6 +17,7 @@ public class EditPresenter implements EditContract.Presenter {
     private EditContract.View view;
     //private PersonRepositoryImpl personRepositoryImpl;
      private  DatabaseManager databaseManager;
+     private CompositeDisposable compositeDisposable;
     @Inject
     public EditPresenter(EditContract.View view, DatabaseManager databaseManager){
         this.view=view;
@@ -67,57 +62,33 @@ public class EditPresenter implements EditContract.Presenter {
 
     @Override
     public void getPersonAndPopulate(final long id) {
+        compositeDisposable=new CompositeDisposable();
+        compositeDisposable.add(databaseManager.getPersonDao().findPerson(id)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Consumer<Person>() {
+            @Override
+            public void accept(Person person) throws Exception {
+                view.populate(person);
+            }
+        }));
 
-//        Completable.fromAction(new Action() {
-//            @Override
-//            public void run() throws Exception {
-//                //Person person=databaseManager.getPersonDao().findPerson(id);
-////                new Handler().post(new Runnable(){
-////                    @Override
-////                    public void run() {
-//                        Person person=databaseManager.getPersonDao().findPerson(id);
-//
-//                   // }
-//                }
-////                if (person!=null){
-////                    view.populate(person);
-////                }
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new CompletableObserver() {
-//                    @Override
-//                    public void onSubscribe(Disposable d) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//                });
-        Person person=databaseManager.getPersonDao().findPerson(id);
-        if (person!=null){
-            view.populate(person);
-        }
     }
+
 
     @Override
     public void update(final Person person) {
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
-                databaseManager.getPersonDao().updatePerson(person);
+                int id= databaseManager.getPersonDao().updatePerson(person);
+                view.close();
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
-        int id= this.databaseManager.getPersonDao().updatePerson(person);
-        view.close();
+        //this.databaseManager.getPersonDao().updatePerson(person);
+        //view.close();
     }
 
     @Override
